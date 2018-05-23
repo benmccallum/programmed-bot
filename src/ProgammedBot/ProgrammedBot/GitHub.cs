@@ -1,4 +1,3 @@
-
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -7,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
 
-namespace ProgammedBot
+namespace ProgrammedBot
 {
     public static class GitHub
     {

@@ -11,7 +11,7 @@ using Slack.Webhooks;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace ProgammedBot
+namespace ProgrammedBot
 {
     public static class BitBucket
     {
