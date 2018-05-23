@@ -17,7 +17,7 @@ namespace ProgrammedBot
     {
         [FunctionName("BitBucket")]
         public async static Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequest req, TraceWriter log)
-        {           
+        {
             var requestBody = new StreamReader(req.Body).ReadToEnd();
 
             var data = JsonConvert.DeserializeObject<PushNotification>(requestBody);
@@ -91,6 +91,6 @@ namespace ProgrammedBot
         {
             public string username { get; set; }
             public string display_name { get; set; }
-        }        
+        }
     }
 }
