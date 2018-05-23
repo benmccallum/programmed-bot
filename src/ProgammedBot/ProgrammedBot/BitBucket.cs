@@ -30,6 +30,9 @@ namespace ProgrammedBot
             var numOfCommits = changes.Sum(c => Math.Max(c.truncated ? 5 : c.commits.Count, c.commits.Count));
             var couldBeMoreCommits = changes.Any(c => c.truncated);
             var repository = data.repository.name;
+            var what = data.push.changes
+                .Select(c => c.@new.type == "branch" ? "branch: " + c.@new.name : "tag: " + c.@new.name)
+                .Distinct();
 
             var slackWebhookUrl = Environment.GetEnvironmentVariable("SlackWebhookUrl", EnvironmentVariableTarget.Process);
             log.Info($"SlackWebhookUrl: {slackWebhookUrl}");
@@ -38,7 +41,10 @@ namespace ProgrammedBot
 
             var slackMessage = new SlackMessage
             {
-                Text = $":medal: {author} :medal: just pushed {(couldBeMoreCommits ? "at least " : "")}{numOfCommits} commit{(numOfCommits > 1 ? "s" : "")} to the {repository} repository. :clap::clap::clap:"
+                Text = $":medal: {author} :medal: just pushed " +
+                    $"{(couldBeMoreCommits ? "at least " : "")}{numOfCommits} commit{(numOfCommits > 1 ? "s" : "")} " +
+                    $"to the {repository} repository " +
+                    $"({string.Join(",", what)}). :clap::clap::clap:"
             };
 
             var success = await slackClient.PostAsync(slackMessage);
@@ -69,8 +75,16 @@ namespace ProgrammedBot
 
         public class Change
         {
+            public State old { get; set; }
+            public State @new { get; set; }
             public bool truncated { get; set; }
             public List<Commit> commits { get; set; }
+        }
+
+        public class State
+        {
+            public string type { get; set; }
+            public string name { get; set; }
         }
 
         public class Commit
