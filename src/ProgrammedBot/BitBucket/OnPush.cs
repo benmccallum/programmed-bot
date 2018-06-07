@@ -11,11 +11,18 @@ using Slack.Webhooks;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace ProgrammedBot
+namespace ProgrammedBot.BitBucket
 {
-    public static class BitBucket
+    public static class OnPush
     {
+        [Obsolete]
         [FunctionName("BitBucket")]
+        public async static Task<IActionResult> RunLegacy([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequest req, TraceWriter log)
+        {
+            return await Run(req, log);
+        }
+
+        [FunctionName("BitBucket-OnPush")]
         public async static Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequest req, TraceWriter log)
         {
             var requestBody = new StreamReader(req.Body).ReadToEnd();
