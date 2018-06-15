@@ -25,12 +25,10 @@ namespace ProgrammedBot.BitBucket
         [FunctionName("BitBucket-OnPush")]
         public async static Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequest req, TraceWriter log)
         {
-            var requestBody = new StreamReader(req.Body).ReadToEnd();
+            log.Info("BitBucket-OnPush trigger.");
 
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var data = JsonConvert.DeserializeObject<PushNotification>(requestBody);
-
-            var dataJson = JsonConvert.SerializeObject(data);
-            log.Info("Received a request.");
 
             var author = data.actor.display_name;
             var changes = data.push.changes;
@@ -41,12 +39,9 @@ namespace ProgrammedBot.BitBucket
                 .Select(c => c.@new.type == "branch" ? "branch: " + c.@new.name : "tag: " + c.@new.name)
                 .Distinct();
 
-            var slackWebhookUrl = Environment.GetEnvironmentVariable("SlackWebhookUrl", EnvironmentVariableTarget.Process);
-            log.Info($"SlackWebhookUrl: {slackWebhookUrl}");
+            var slackClient = SlackClientFactory.Create();
 
-            var slackClient = new SlackClient(slackWebhookUrl);
-
-            var slackMessage = new SlackMessage
+            var slackMessage = new SlackMessage()
             {
                 Text = $":medal: {author} :medal: just pushed " +
                     $"{(couldBeMoreCommits ? "at least " : "")}{numOfCommits} commit{(numOfCommits > 1 ? "s" : "")} " +
